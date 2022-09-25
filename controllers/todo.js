@@ -48,8 +48,8 @@ exports.createTodo = async (req, res, next) => {
 exports.showTodo = async (req, res, next) => {
   try {
     const connectionId = req.query.connection_id
-    const categoryId = req.query.category_id
-    const resultTodo = await Todo.find({ connectionId: connectionId, categoryId: categoryId })
+    // const categoryId = req.query.category_id
+    const resultTodo = await Todo.find({ connectionId: connectionId })
 
     res.status(200).json({
       data: resultTodo,
