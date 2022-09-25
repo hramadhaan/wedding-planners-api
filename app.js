@@ -8,6 +8,7 @@ require('dotenv').config()
 const authRoutes = require('./routes/auth')
 const connectionRoutes = require('./routes/connection')
 const todoRoutes = require('./routes/todo')
+const categoryRoutes = require('./routes/category')
 
 const app = express()
 
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 app.use('/auth', authRoutes)
 app.use('/connection', connectionRoutes)
 app.use('/todo', todoRoutes)
+app.use('/category', categoryRoutes)
 
 app.use((error, req, res, next) => {
   console.log('err: ', error)

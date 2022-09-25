@@ -17,6 +17,7 @@ exports.createTodo = async (req, res, next) => {
     const title = req.body.title
     const description = req.body.description
     const price = req.body.price
+    const categoryId = req.body.category_id
     const photos = req.files
 
     const photoPaths = []
@@ -27,7 +28,7 @@ exports.createTodo = async (req, res, next) => {
       })
     }
 
-    const saveTodo = new Todo({ connectionId, title, description, price, photos: photoPaths })
+    const saveTodo = new Todo({ connectionId, title, description, price, photos: photoPaths, categoryId: categoryId })
 
     const dataTodo = await saveTodo.save()
 
@@ -46,8 +47,9 @@ exports.createTodo = async (req, res, next) => {
 
 exports.showTodo = async (req, res, next) => {
   try {
-    const connectionId = req.params.id
-    const resultTodo = await Todo.find({ connectionId: connectionId })
+    const connectionId = req.query.connection_id
+    const categoryId = req.query.category_id
+    const resultTodo = await Todo.find({ connectionId: connectionId, categoryId: categoryId })
 
     res.status(200).json({
       data: resultTodo,
