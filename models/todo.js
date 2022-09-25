@@ -25,6 +25,11 @@ const todoSchema = new Schema({
   },
   photos: {
     type: Schema.Types.Array
+  },
+  categoryId: {
+    type: Schema.Types.ObjectId,
+    ref: 'category',
+    required: true
   }
 }, { timestamps: true })
 

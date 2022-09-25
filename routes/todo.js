@@ -21,7 +21,6 @@ const fileStorage = multer.diskStorage({
 })
 
 router.post('/create', multer({ storage: fileStorage }).array('photos', 4), todoControllers.createTodo)
-
-router.get('/list/:id', todoControllers.showTodo)
+router.get('/list', todoControllers.showTodo)
 
 module.exports = router
