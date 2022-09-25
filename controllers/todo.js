@@ -1,6 +1,6 @@
 const Todo = require('../models/todo')
 const { validationResult } = require('express-validator')
-const { isEmpty } = require('lodash')
+// const { isEmpty } = require('lodash')
 
 exports.createTodo = async (req, res, next) => {
   const errors = validationResult(req)
@@ -18,17 +18,8 @@ exports.createTodo = async (req, res, next) => {
     const description = req.body.description
     const price = req.body.price
     const categoryId = req.body.category_id
-    const photos = req.files
 
-    const photoPaths = []
-
-    if (!isEmpty(photos)) {
-      photos.forEach((item) => {
-        photoPaths.push(item.path)
-      })
-    }
-
-    const saveTodo = new Todo({ connectionId, title, description, price, photos: photoPaths, categoryId: categoryId })
+    const saveTodo = new Todo({ connectionId, title, description, price, categoryId: categoryId })
 
     const dataTodo = await saveTodo.save()
 
