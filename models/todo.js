@@ -23,6 +23,10 @@ const todoSchema = new Schema({
     type: Schema.Types.Boolean,
     default: false
   },
+  urlLink: {
+    type: Schema.Types.String,
+    required: false
+  },
   categoryId: {
     type: Schema.Types.ObjectId,
     ref: 'category',

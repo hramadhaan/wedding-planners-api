@@ -25,10 +25,9 @@ const authenticationSchema = new Schema(
       default: ''
     },
     connectId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: false,
-      ref: 'connection',
-      default: ''
+      ref: 'connection'
     }
   },
   { timestamps: true }
