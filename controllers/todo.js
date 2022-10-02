@@ -1,6 +1,6 @@
 const Todo = require('../models/todo')
 const { validationResult } = require('express-validator')
-// const { isEmpty } = require('lodash')
+const isEmpty = require('lodash/isEmpty')
 
 exports.createTodo = async (req, res, next) => {
   const errors = validationResult(req)
@@ -39,8 +39,19 @@ exports.createTodo = async (req, res, next) => {
 exports.showTodo = async (req, res, next) => {
   try {
     const connectionId = req.query.connection_id
-    // const categoryId = req.query.category_id
-    const resultTodo = await Todo.find({ connectionId: connectionId })
+    const categoryId = req.query.category_id
+
+    let data = {
+      connectionId: connectionId
+    }
+
+    if (!isEmpty(categoryId)) {
+      data = {
+        connectionId: connectionId,
+        categoryId: categoryId
+      }
+    }
+    const resultTodo = await Todo.find(data).populate('categoryId')
 
     res.status(200).json({
       data: resultTodo,

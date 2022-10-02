@@ -42,8 +42,7 @@ exports.requestConnection = (req, res, next) => {
       }
 
       const saveConnection = new Connection({
-        firstPerson: requester,
-        secondPerson: findCouple._id
+        users: [requester, findCouple._id]
       })
       return saveConnection.save()
     })
@@ -80,69 +79,80 @@ exports.requestConnection = (req, res, next) => {
 }
 
 exports.acceptConnection = async (req, res, next) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    const error = new Error('Validation Failed.')
-    error.statusCode = 422
-    error.data = errors.array()
-    throw error
-  }
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      const error = new Error('Validation Failed.')
+      error.statusCode = 400
+      error.data = errors.array()
+      throw error
+    }
 
-  const accepter = req.userId
+    const accepter = req.userId
 
-  Connection.findOne({ secondPerson: accepter })
-    .then((findResult) => {
-      if (isEmpty(findResult)) {
-        res.status(200).json({
-          message: 'Akun Anda tidak ditemukan',
-          success: false
-        })
-      }
-      findResult.verified = true
-      return findResult.save()
-    })
-    .then((response) => {
-      io.getIO().emit(response._id, { data: 'reload' })
-      res.status(200).json({
-        message: 'Anda telah melakukan konfirmasi',
-        success: true,
-        data: response
+    const resultAccepter = await Connection.findOne({ users: accepter })
+
+    if (isEmpty(resultAccepter)) {
+      res.status(404).json({
+        message: 'Akun Anda tidak ditemukan',
+        success: false
       })
-    }).catch(err => {
-      if (!err.statusCode) {
-        err.statusCode = 500
-      }
-      next(err)
+    } else if (resultAccepter.verified === true) {
+      res.status(400).json({
+        message: 'Anda telah melakukan konfirmasi',
+        success: false
+      })
+    }
+
+    resultAccepter.verified = true
+
+    const saveConnection = await resultAccepter.save()
+
+    io.getIO().emit(saveConnection._id, { data: 'reload' })
+
+    res.status(200).json({
+      message: 'Anda telah melakukan konfirmasi',
+      success: true,
+      data: saveConnection
     })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
 }
 
 exports.checkConnection = async (req, res, next) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    const error = new Error('Validation Failed.')
-    error.statusCode = 422
-    error.data = errors.array()
-    throw error
-  }
-
-  const user = req.userId
-
   try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      const error = new Error('Validation Failed.')
+      error.statusCode = 422
+      error.data = errors.array()
+      throw error
+    }
+
+    const user = req.userId
     const userData = await Auth.findById(user)
 
     if (isEmpty(userData)) {
-      res.status(200).json({
+      res.status(404).json({
         message: 'Data Anda tidak ditemukan',
         success: false
       })
-    } else if (isEmpty(userData.connectId)) {
-      res.status(200).json({
+    }
+
+    console.log('ConnectId: ', userData.connectId)
+
+    if (!userData.connectId) {
+      res.status(404).json({
         message: 'Anda belum memiliki pasangan',
         success: false
       })
     }
 
-    const connectData = await Connection.findById(userData.connectId).populate(['firstPerson', 'secondPerson'])
+    const connectData = await Connection.findById(userData.connectId).populate('users')
 
     res.status(200).json({
       message: 'Berhasil mendapatkan pasangan',

@@ -11,7 +11,8 @@ const categorySchema = new Schema({
   },
   connectionId: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'connection'
   }
 }, { timestamps: true })
 
