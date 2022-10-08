@@ -1,6 +1,7 @@
 const Todo = require('../models/todo')
 const { validationResult } = require('express-validator')
 const isEmpty = require('lodash/isEmpty')
+const { sendTargetNotifications } = require('../services/firebase/notifications')
 
 exports.createTodo = async (req, res, next) => {
   const errors = validationResult(req)
@@ -13,6 +14,7 @@ exports.createTodo = async (req, res, next) => {
 
   //   Payload
   try {
+    const userId = req.userId
     const connectionId = req.body.id
     const title = req.body.title
     const description = req.body.description
@@ -28,6 +30,8 @@ exports.createTodo = async (req, res, next) => {
       message: 'Berhasil menambahkan todo',
       success: true
     })
+
+    sendTargetNotifications(userId, { title: 'Telah mandaftarkan barang', body: title }, { key: 'Create Todo' })
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500
