@@ -1,6 +1,6 @@
 // Model
 const { validationResult } = require('express-validator')
-const { isEmpty } = require('lodash')
+const isEmpty = require('lodash/isEmpty')
 const Category = require('../models/category')
 
 exports.createCategory = async (req, res, next) => {

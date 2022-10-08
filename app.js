@@ -11,6 +11,7 @@ const connectionRoutes = require('./routes/connection')
 const todoRoutes = require('./routes/todo')
 const categoryRoutes = require('./routes/category')
 const deviceTokenRoutes = require('./routes/deviceToken')
+const commentRoutes = require('./routes/comment')
 
 // Firebase
 const firebaseJson = require('./services/firebase/wedding-planner-610ac-firebase-adminsdk-eftyt-f275f240df.json')
@@ -41,6 +42,7 @@ app.use('/connection', connectionRoutes)
 app.use('/todo', todoRoutes)
 app.use('/category', categoryRoutes)
 app.use('/device-token', deviceTokenRoutes)
+app.use('/comment', commentRoutes)
 
 app.use((error, req, res, next) => {
   console.log('err: ', error)
