@@ -143,8 +143,6 @@ exports.checkConnection = async (req, res, next) => {
       })
     }
 
-    console.log('ConnectId: ', userData.connectId)
-
     if (!userData.connectId) {
       res.status(404).json({
         message: 'Anda belum memiliki pasangan',

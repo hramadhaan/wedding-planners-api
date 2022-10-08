@@ -1,26 +1,32 @@
-const firebase = require('firebase-admin')
 const Auth = require('../../models/auth')
+const firebase = require('firebase-admin')
+const Device = require('../../models/deviceToken')
 const Connection = require('../../models/connection')
 
-export const sendNotifications = async (user = '', message = { title: '', body: '' }) => {
+exports.sendTargetNotifications = async (user = '', message = { title: '', body: '' }, data = {}) => {
   try {
     const userRequest = await Auth.findById(user)
     const connectionId = userRequest.connectId
 
     const connectData = await Connection.findById(connectionId)
 
-    const recipient = connectData.users.filter((user) => user !== userRequest)
+    const recipient = connectData.users.find((item) => item.toString() !== user)
+
+    const recipientData = await Device.findOne({ userId: recipient })
+
+    const recipientToken = recipientData.token
 
     const payload = {
-      token: recipient,
-      notifications: {
+      token: recipientToken,
+      notification: {
         title: message.title,
         body: message.body
-      }
+      },
+      data: data
     }
+
     await firebase.messaging().send(payload)
   } catch (err) {
-    console.log('Err notifications: ', err)
     const error = new Error('Error when send notifications')
     error.statusCode = 422
     error.data = err
