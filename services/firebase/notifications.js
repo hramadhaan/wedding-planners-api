@@ -33,3 +33,15 @@ exports.sendTargetNotifications = async (user = '', message = { title: '', body:
     throw error
   }
 }
+
+exports.sendAllConnection = (user = '', message = { title: '', body: '' }, data = {}) => {
+  try {
+    // Waiting from comment model
+  } catch (err) {
+    console.log('Err sendAllConnection: ', err)
+    const error = new Error('Error when send notifications')
+    error.statusCode = 422
+    error.data = err
+    throw error
+  }
+}
