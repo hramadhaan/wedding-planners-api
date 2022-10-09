@@ -52,7 +52,7 @@ exports.showComment = async (req, res, next) => {
       throw error
     }
 
-    const userId = req.userId
+    // const userId = req.userId
     const postId = req.query.id
 
     if (isEmpty(postId)) {
@@ -62,7 +62,7 @@ exports.showComment = async (req, res, next) => {
       })
     }
 
-    const response = await Comment.find({ userId: userId, postId: postId }).populate(['postId', 'userId'])
+    const response = await Comment.find({ postId: postId }).populate(['postId', 'userId'])
 
     res.status(200).json({
       message: 'Berhasil mendapatkan komentar di post tersebut',
