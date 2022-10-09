@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
   const authHeader = req.get('Authorization')
 
   if (!authHeader) {
-    res.status(401).json({
+    res.status(400).json({
       success: false,
       message: 'Token Anda tidak valid'
     })
@@ -22,7 +22,7 @@ module.exports = (req, res, next) => {
   }
 
   if (!decodedToken) {
-    res.status(400).json({
+    res.status(401).json({
       message: 'Harap login terlebih dahulu',
       success: false
     })
