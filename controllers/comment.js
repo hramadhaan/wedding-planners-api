@@ -1,6 +1,7 @@
 const Comment = require('../models/comment')
 const { validationResult } = require('express-validator')
 const isEmpty = require('lodash/isEmpty')
+const { sendTargetNotifications } = require('../services/firebase/notifications')
 
 exports.postComment = async (req, res, next) => {
   try {
@@ -28,6 +29,8 @@ exports.postComment = async (req, res, next) => {
     const responseData = await dataPayload.save()
 
     const responsePopulated = await responseData.populate(['userId', 'postId'])
+
+    sendTargetNotifications(userId, { title: 'Ada pesan terbaru di kolom diskusi', body: responseData.comment }, { screen: 'CommentScreen', id: responseData?._id.toString() })
 
     res.status(201).json({
       message: 'Berhasil menambahkan komentar',

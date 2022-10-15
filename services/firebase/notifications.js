@@ -22,11 +22,14 @@ exports.sendTargetNotifications = async (user = '', message = { title: '', body:
         title: message.title,
         body: message.body
       },
-      data: data
+      data: {
+        ...data
+      }
     }
 
     await firebase.messaging().send(payload)
   } catch (err) {
+    console.log('Err: ', err)
     const error = new Error('Error when send notifications')
     error.statusCode = 422
     error.data = err
