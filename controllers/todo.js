@@ -20,8 +20,9 @@ exports.createTodo = async (req, res, next) => {
     const description = req.body.description
     const price = req.body.price
     const categoryId = req.body.category_id
+    const urlLink = req.body.url_link
 
-    const saveTodo = new Todo({ connectionId, title, description, price, categoryId: categoryId })
+    const saveTodo = new Todo({ connectionId, title, description, price, categoryId: categoryId, urlLink: urlLink })
 
     const dataTodo = await saveTodo.save()
 
