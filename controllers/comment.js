@@ -2,6 +2,7 @@ const Comment = require('../models/comment')
 const { validationResult } = require('express-validator')
 const isEmpty = require('lodash/isEmpty')
 const { sendTargetNotifications } = require('../services/firebase/notifications')
+const { sendDataComment } = require('../services/socket')
 
 exports.postComment = async (req, res, next) => {
   try {
@@ -30,7 +31,11 @@ exports.postComment = async (req, res, next) => {
 
     const responsePopulated = await responseData.populate(['userId', 'postId'])
 
+    // Push Notifications
     sendTargetNotifications(userId, { title: 'Ada pesan terbaru di kolom diskusi', body: responseData.comment }, { screen: 'CommentScreen', id: responseData?._id.toString() })
+
+    // Send Data to Websocket
+    sendDataComment(userId, postId, responsePopulated)
 
     res.status(201).json({
       message: 'Berhasil menambahkan komentar',
