@@ -7,5 +7,6 @@ const router = express.Router()
 router.post('/create', isAuth, todoControllers.createTodo)
 router.get('/list', todoControllers.showTodo)
 router.get('/total', todoControllers.todoSubTotal)
+router.post('/update', todoControllers.updateTodo)
 
 module.exports = router

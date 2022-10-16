@@ -115,3 +115,49 @@ exports.showTodo = async (req, res, next) => {
     next(err)
   }
 }
+
+exports.updateTodo = async (req, res, next) => {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      const error = new Error('Validation Failed.')
+      error.statusCode = 422
+      error.data = errors.array()
+      throw error
+    }
+
+    const id = req.body.id
+    const title = req.body.title
+    const description = req.body.description
+    const price = req.body.price
+    const categoryId = req.body.category_id
+    const urlLink = req.body.url_link
+    const status = req.body.status
+
+    const todoData = await Todo.findById(id)
+
+    if (isEmpty(todoData)) {
+      res.status(404).json({
+        message: 'Barang yang Anda cari tidak ada',
+        success: false
+      })
+    }
+
+    todoData.title = title
+    todoData.description = description
+    todoData.price = price
+    todoData.categoryId = categoryId
+    todoData.urlLink = urlLink
+    todoData.status = status
+
+    const saveTodo = await (await todoData.save()).populate('categoryId')
+
+    res.status(201).json({
+      message: 'Berhasil melakukan update',
+      data: saveTodo,
+      success: true
+    })
+  } catch (err) {
+
+  }
+}
