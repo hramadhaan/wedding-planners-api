@@ -3,6 +3,51 @@ const { validationResult } = require('express-validator')
 const isEmpty = require('lodash/isEmpty')
 const { sendTargetNotifications } = require('../services/firebase/notifications')
 
+exports.todoSubTotal = async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    const error = new Error('Validation Failed.')
+    error.statusCode = 422
+    error.data = errors.array()
+    throw error
+  }
+
+  try {
+    const id = req.query.connection_id
+    const todoData = await Todo.find({ connectionId: id })
+    if (!isEmpty(todoData)) {
+      let totalPaid = 0
+      let totalPrice = 0
+      const todoPaid = todoData.filter((item) => item.status === true)
+      todoPaid.forEach((item, index) => {
+        totalPaid += item.price
+      })
+      todoData.forEach((item, index) => {
+        totalPrice += item.price
+      })
+
+      res.status(200).json({
+        success: true,
+        message: 'Berhasil menghitung total',
+        data: {
+          paid: totalPaid,
+          total: totalPrice,
+          persentace: Math.round(todoPaid.length / todoData.length * 100)
+        }
+      })
+    }
+    res.status(404).json({
+      message: 'Barang yang akan dibeli tidak ditemukan',
+      success: false
+    })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
+
 exports.createTodo = async (req, res, next) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
