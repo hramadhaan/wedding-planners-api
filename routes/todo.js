@@ -8,5 +8,6 @@ router.post('/create', isAuth, todoControllers.createTodo)
 router.get('/list', todoControllers.showTodo)
 router.get('/total', todoControllers.todoSubTotal)
 router.post('/update', todoControllers.updateTodo)
+router.get('/delete/:id', todoControllers.deleteTodo)
 
 module.exports = router
