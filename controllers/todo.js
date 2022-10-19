@@ -1,4 +1,5 @@
 const Todo = require('../models/todo')
+const Comment = require('../models/comment')
 const { validationResult } = require('express-validator')
 const isEmpty = require('lodash/isEmpty')
 const { sendTargetNotifications } = require('../services/firebase/notifications')
@@ -158,6 +159,44 @@ exports.updateTodo = async (req, res, next) => {
       success: true
     })
   } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
+  }
+}
 
+exports.deleteTodo = async (req, res, next) => {
+  try {
+    const id = req.params.id
+
+    const checkTodo = await Todo.findById(id)
+
+    if (isEmpty(checkTodo)) {
+      res.status(404).json({
+        message: 'Tidak dapat menemukan barang',
+        success: false
+      })
+    }
+    await Todo.findByIdAndRemove(id)
+
+    // Remove Comment
+    const checkCommentTodo = await Comment.find({ postId: id })
+
+    if (!isEmpty(checkCommentTodo)) {
+      checkCommentTodo.forEach(async (item) => {
+        await Comment.findByIdAndRemove(item.id)
+      })
+    }
+
+    res.status(200).json({
+      message: 'Berhasil menghapus barang',
+      success: true
+    })
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500
+    }
+    next(err)
   }
 }

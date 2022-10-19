@@ -2,6 +2,7 @@
 const { validationResult } = require('express-validator')
 const isEmpty = require('lodash/isEmpty')
 const Category = require('../models/category')
+const Todo = require('../models/todo')
 
 exports.createCategory = async (req, res, next) => {
   try {
@@ -58,13 +59,20 @@ exports.deleteCategory = async (req, res, next) => {
         success: false
       })
     }
+    await Category.findByIdAndRemove(categoryId)
 
-    const dataRemove = await Category.findByIdAndRemove(categoryId)
+    // Remove Barang
+    const checkTodo = await Todo.find({ categoryId: categoryId })
+
+    if (!isEmpty(checkTodo)) {
+      checkTodo.forEach(async (item) => {
+        await Todo.findByIdAndRemove(item.id)
+      })
+    }
 
     res.status(200).json({
       message: 'Kategori berhasil dihapus',
-      success: true,
-      data: dataRemove
+      success: true
     })
   } catch (err) {
     if (!res.statusCode) {
