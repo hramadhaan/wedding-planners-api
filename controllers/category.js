@@ -136,6 +136,7 @@ exports.fetchCategory = async (req, res, next) => {
     const connectionId = req.params.id
 
     const resultCategoryByConnection = await Category.find({ connectionId: connectionId })
+      .collation({ locale: 'en', strength: 2 }).sort({ name: 1 })
 
     res.status(200).json({
       message: 'Kategori berhasil didapatkan',
