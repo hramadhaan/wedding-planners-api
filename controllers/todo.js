@@ -68,6 +68,13 @@ exports.createTodo = async (req, res, next) => {
     const categoryId = req.body.category_id
     const urlLink = req.body.url_link
 
+    if (isEmpty(connectionId) || isEmpty(title) || isEmpty(description) || isEmpty(price) || isEmpty(categoryId)) {
+      res.status(400).json({
+        message: 'Kolom tidak boleh kosong kecuali url link',
+        success: false
+      })
+    }
+
     const saveTodo = new Todo({ connectionId, title, description, price, categoryId: categoryId, urlLink: urlLink })
 
     const dataTodo = await saveTodo.save()
@@ -134,6 +141,13 @@ exports.updateTodo = async (req, res, next) => {
     const categoryId = req.body.category_id
     const urlLink = req.body.url_link
     const status = req.body.status
+
+    if (isEmpty(id) || isEmpty(title) || isEmpty(description) || isEmpty(price) || isEmpty(categoryId)) {
+      res.status(400).json({
+        message: 'Kolom tidak boleh kosong kecuali url link',
+        success: false
+      })
+    }
 
     const todoData = await Todo.findById(id)
 
