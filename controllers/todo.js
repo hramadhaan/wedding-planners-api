@@ -98,6 +98,8 @@ exports.showTodo = async (req, res, next) => {
   try {
     const connectionId = req.query.connection_id
     const categoryId = req.query.category_id
+    const currentPage = req.query.page
+    const limitPage = req.query.limit
 
     let data = {
       connectionId: connectionId
@@ -109,12 +111,22 @@ exports.showTodo = async (req, res, next) => {
         categoryId: categoryId
       }
     }
-    const resultTodo = await Todo.find(data).populate('categoryId')
+    const totalPage = await Todo.find(data).countDocuments()
+    let resultTodo = await Todo.find(data).skip((currentPage - 1) * limitPage).limit(limitPage).populate('categoryId')
+
+    if (isEmpty(currentPage) || isEmpty(limitPage)) {
+      resultTodo = await Todo.find(data).populate('categoryId')
+    }
 
     res.status(200).json({
       data: resultTodo,
       message: 'Berhasil mendapatkan list todo',
-      success: true
+      success: true,
+      pagination: {
+        total_page: Math.ceil(totalPage / limitPage) || 1,
+        current_page: Number(currentPage) || 1,
+        count: totalPage
+      }
     })
   } catch (err) {
     if (!err.statusCode) {
